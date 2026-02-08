@@ -49,7 +49,7 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-asks.register<Test>("unitTest") {
+tasks.register<Test>("unitTest") {
     description = "Runs unit tests."
     group = "verification"
 
