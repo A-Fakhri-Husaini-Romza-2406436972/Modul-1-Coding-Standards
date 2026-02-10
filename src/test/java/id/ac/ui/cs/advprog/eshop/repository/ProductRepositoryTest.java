@@ -65,4 +65,67 @@ class ProductRepositoryTest {
         assertEquals(product2.getProductId(), savedProduct.getProductId());
         assertFalse(productIterator.hasNext());
     }
+
+    @Test
+    void testEditProductPositive() {
+        Product product = new Product();
+        product.setProductId("id-123");
+        product.setProductName("Product Lama");
+        product.setProductQuantity(10);
+        productRepository.create(product);
+
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("id-123");
+        updatedProduct.setProductName("Product Baru");
+        updatedProduct.setProductQuantity(20);
+        Product result = productRepository.update(updatedProduct);
+
+        assertNotNull(result);
+        assertEquals("Product Baru", result.getProductName());
+        assertEquals(20, result.getProductQuantity());
+
+        Product storedProduct = productRepository.findById("id-123");
+        assertEquals("Product Baru", storedProduct.getProductName());
+    }
+
+    @Test
+    void testEditProductNegative() {
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("id-gaib");
+        updatedProduct.setProductName("Product Gaib");
+        updatedProduct.setProductQuantity(0);
+
+        Product result = productRepository.update(updatedProduct);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testDeleteProductPositive() {
+        Product product = new Product();
+        product.setProductId("id-delete");
+        product.setProductName("Mau Dihapus");
+        product.setProductQuantity(1);
+        productRepository.create(product);
+
+        productRepository.delete("id-delete");
+
+        assertNull(productRepository.findById("id-delete"));
+        Iterator<Product> iterator = productRepository.findAll();
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    void testDeleteProductNegative() {
+        Product product = new Product();
+        product.setProductId("id-tetap");
+        product.setProductName("Jangan Dihapus");
+        productRepository.create(product);
+
+        productRepository.delete("id-salah");
+
+        assertNotNull(productRepository.findById("id-tetap"));
+        Iterator<Product> iterator = productRepository.findAll();
+        assertTrue(iterator.hasNext());
+    }
 }
