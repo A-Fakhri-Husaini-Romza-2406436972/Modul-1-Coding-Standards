@@ -12,6 +12,7 @@ on:
   schedule:
     - cron: '37 14 * * 0'
   push:
+  pull_request:
 
 # Declare default permissions as read only.
 permissions: read-all
