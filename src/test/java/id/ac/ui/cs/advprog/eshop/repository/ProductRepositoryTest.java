@@ -39,6 +39,21 @@ class ProductRepositoryTest {
     }
 
     @Test
+    void testCreateAndFindNull() {
+        Product product = new Product();
+        product.setProductName("Sampo Cap Bambang");
+        product.setProductQuantity(100);
+        productRepository.create(product);
+
+        Iterator<Product> productIterator = productRepository.findAll();
+        assertTrue(productIterator.hasNext());
+        Product savedProduct = productIterator.next();
+
+        assertEquals(product.getProductId(), savedProduct.getProductId());
+        assertEquals(product.getProductName(), savedProduct.getProductName());
+        assertEquals(product.getProductQuantity(), savedProduct.getProductQuantity());
+    }
+    @Test
     void testFindAllIfEmpty() {
         Iterator<Product> productIterator = productRepository.findAll();
         assertFalse(productIterator.hasNext());
@@ -101,6 +116,28 @@ class ProductRepositoryTest {
     }
 
     @Test
+    void testEditProductNegativeWithDifferentExistingId() {
+        Product existingProduct = new Product();
+        existingProduct.setProductId("id-123");
+        existingProduct.setProductName("Product Lama");
+        existingProduct.setProductQuantity(10);
+        productRepository.create(existingProduct);
+
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("id-gaib");
+        updatedProduct.setProductName("Product Gaib");
+        updatedProduct.setProductQuantity(0);
+
+        Product result = productRepository.update(updatedProduct);
+
+        assertNull(result);
+        Product storedProduct = productRepository.findById("id-123");
+        assertNotNull(storedProduct);
+        assertEquals("Product Lama", storedProduct.getProductName());
+        assertEquals(10, storedProduct.getProductQuantity());
+    }
+
+    @Test
     void testDeleteProductPositive() {
         Product product = new Product();
         product.setProductId("id-delete");
@@ -125,6 +162,19 @@ class ProductRepositoryTest {
         productRepository.delete("id-salah");
 
         assertNotNull(productRepository.findById("id-tetap"));
+        Iterator<Product> iterator = productRepository.findAll();
+        assertTrue(iterator.hasNext());
+    }
+
+    @Test
+    void testDeleteProductNegativeNull() {
+        Product product = new Product();
+        product.setProductName("Jangan Dihapus");
+        productRepository.create(product);
+
+        productRepository.delete("id-salah");
+
+        assertNull(productRepository.findById("id-tetap"));
         Iterator<Product> iterator = productRepository.findAll();
         assertTrue(iterator.hasNext());
     }
