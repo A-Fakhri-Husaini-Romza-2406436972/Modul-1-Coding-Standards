@@ -1,6 +1,9 @@
+import org.gradle.api.plugins.quality.Pmd
+
 plugins {
     java
     jacoco
+    pmd
     id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -25,6 +28,12 @@ repositories {
     mavenCentral()
 }
 
+pmd {
+    toolVersion = "7.0.0-rc4"
+    ruleSetFiles = files("$rootDir/config/pmd/ruleset.xml")
+    ruleSets = listOf()
+}
+
 val seleniumJavaVersion = "4.14.1"
 val seleniumJupiterVersion = "5.0.1"
 val webdrivermanagerVersion = "5.6.3"
@@ -47,6 +56,13 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+tasks.withType<Pmd>().configureEach {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
 
 tasks.register<Test>("unitTest") {

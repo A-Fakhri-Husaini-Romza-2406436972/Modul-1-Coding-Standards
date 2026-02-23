@@ -118,7 +118,7 @@ class ProductRepositoryTest {
     @Test
     void testEditProductNegativeWithDifferentExistingId() {
         Product existingProduct = new Product();
-        existingProduct.setProductId("id-123");
+        existingProduct.setProductId("id-12345");
         existingProduct.setProductName("Product Lama");
         existingProduct.setProductQuantity(10);
         productRepository.create(existingProduct);
@@ -131,7 +131,7 @@ class ProductRepositoryTest {
         Product result = productRepository.update(updatedProduct);
 
         assertNull(result);
-        Product storedProduct = productRepository.findById("id-123");
+        Product storedProduct = productRepository.findById("id-12345");
         assertNotNull(storedProduct);
         assertEquals("Product Lama", storedProduct.getProductName());
         assertEquals(10, storedProduct.getProductQuantity());
