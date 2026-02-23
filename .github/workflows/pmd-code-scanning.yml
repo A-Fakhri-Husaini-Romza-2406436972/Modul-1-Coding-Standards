@@ -1,0 +1,39 @@
+name: PMD Code Scanning
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  pmd:
+    name: PMD Analysis
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out the Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Run PMD
+        uses: pmd/pmd-github-action@v2
+        with:
+          version: "7.0.0-rc4"
+          sourcePath: "src/main/java"
+          rulesets: "config/pmd/ruleset.xml"
+          analyzeModifiedFilesOnly: false
+          uploadSarifReport: false
+
+      - name: Upload PMD SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-report.sarif
+          category: pmd
