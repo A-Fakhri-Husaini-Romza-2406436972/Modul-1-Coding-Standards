@@ -30,8 +30,8 @@ repositories {
 
 pmd {
     toolVersion = "7.0.0-rc4"
-    isConsoleOutput = true
-    rulesMinimumPriority = 5
+    ruleSetFiles = files("$rootDir/config/pmd/ruleset.xml")
+    ruleSets = listOf()
 }
 
 val seleniumJavaVersion = "4.14.1"

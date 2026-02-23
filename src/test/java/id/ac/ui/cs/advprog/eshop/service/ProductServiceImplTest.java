@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceImplTest {
+    private static final String PRODUCT_ID_2 = "product-2";
 
     @Mock
     private ProductRepository productRepository;
@@ -44,22 +45,22 @@ public class ProductServiceImplTest {
     @Test
     void findByIdShouldReturnProductFromRepository() {
         Product product = new Product();
-        product.setProductId("product-1");
+        product.setProductId(PRODUCT_ID_2);
         product.setProductName("Sampo Cap Bambang");
         product.setProductQuantity(100);
 
-        when(productRepository.findById("product-1")).thenReturn(product);
+        when(productRepository.findById(PRODUCT_ID_2)).thenReturn(product);
 
-        Product result = productService.findById("product-1");
+        Product result = productService.findById(PRODUCT_ID_2);
 
-        verify(productRepository).findById("product-1");
+        verify(productRepository).findById(PRODUCT_ID_2);
         assertSame(product, result);
     }
 
     @Test
     void updateShouldCallRepositoryUpdate() {
         Product product = new Product();
-        product.setProductId("product-1");
+        product.setProductId("product-3");
         product.setProductName("Sampo Baru");
         product.setProductQuantity(200);
 
@@ -78,12 +79,12 @@ public class ProductServiceImplTest {
     @Test
     void findAllShouldConvertIteratorToList() {
         Product firstProduct = new Product();
-        firstProduct.setProductId("product-1");
+        firstProduct.setProductId("product-4");
         firstProduct.setProductName("Sampo Cap Bambang");
         firstProduct.setProductQuantity(100);
 
         Product secondProduct = new Product();
-        secondProduct.setProductId("product-2");
+        secondProduct.setProductId("product-5");
         secondProduct.setProductName("Sampo Cap Usep");
         secondProduct.setProductQuantity(50);
 
@@ -94,8 +95,8 @@ public class ProductServiceImplTest {
 
         verify(productRepository).findAll();
         assertEquals(2, result.size());
-        assertEquals("product-1", result.get(0).getProductId());
-        assertEquals("product-2", result.get(1).getProductId());
+        assertEquals("product-4", result.get(0).getProductId());
+        assertEquals("product-5", result.get(1).getProductId());
     }
 
     @Test

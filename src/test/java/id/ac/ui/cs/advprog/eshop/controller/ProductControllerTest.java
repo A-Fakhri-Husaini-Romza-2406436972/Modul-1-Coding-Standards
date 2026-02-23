@@ -46,7 +46,7 @@ public class ProductControllerTest {
 
         mockMvc.perform(post("/product/create")
                         .param("productId", "product-1")
-                        .param("productName", "Sampo Cap Bambang")
+                        .param("productName", "Sampo Cap Bambang2")
                         .param("productQuantity", "100"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:list"));
@@ -55,20 +55,20 @@ public class ProductControllerTest {
         verify(productService).create(productCaptor.capture());
         Product createdProduct = productCaptor.getValue();
         assertEquals("product-1", createdProduct.getProductId());
-        assertEquals("Sampo Cap Bambang", createdProduct.getProductName());
+        assertEquals("Sampo Cap Bambang2", createdProduct.getProductName());
         assertEquals(100, createdProduct.getProductQuantity());
     }
 
     @Test
     void editProductPageShouldShowEditProductViewWithExistingProduct() throws Exception {
         Product existingProduct = new Product();
-        existingProduct.setProductId("product-1");
-        existingProduct.setProductName("Sampo Cap Bambang");
+        existingProduct.setProductId("product-2");
+        existingProduct.setProductName("Sampo Cap Bambang3");
         existingProduct.setProductQuantity(100);
 
-        when(productService.findById("product-1")).thenReturn(existingProduct);
+        when(productService.findById("product-2")).thenReturn(existingProduct);
 
-        mockMvc.perform(get("/product/edit/product-1"))
+        mockMvc.perform(get("/product/edit/product-2"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("EditProduct"))
                 .andExpect(model().attributeExists("product"))
@@ -78,7 +78,7 @@ public class ProductControllerTest {
     @Test
     void editProductPostShouldUpdateProductAndRedirectToList() throws Exception {
         mockMvc.perform(post("/product/edit")
-                        .param("productId", "product-1")
+                        .param("productId", "product-3")
                         .param("productName", "Sampo Baru")
                         .param("productQuantity", "200"))
                 .andExpect(status().is3xxRedirection())
@@ -87,25 +87,25 @@ public class ProductControllerTest {
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productService).update(productCaptor.capture());
         Product updatedProduct = productCaptor.getValue();
-        assertEquals("product-1", updatedProduct.getProductId());
+        assertEquals("product-3", updatedProduct.getProductId());
         assertEquals("Sampo Baru", updatedProduct.getProductName());
         assertEquals(200, updatedProduct.getProductQuantity());
     }
 
     @Test
     void deleteProductShouldDeleteProductAndRedirectToList() throws Exception {
-        mockMvc.perform(get("/product/delete/product-1"))
+        mockMvc.perform(get("/product/delete/product-4"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:../list"));
 
-        verify(productService).delete("product-1");
+        verify(productService).delete("product-4");
     }
 
     @Test
     void productListPageShouldShowAllProducts() throws Exception {
         Product firstProduct = new Product();
-        firstProduct.setProductId("product-1");
-        firstProduct.setProductName("Sampo Cap Bambang");
+        firstProduct.setProductId("product-4");
+        firstProduct.setProductName("Sampo Cap Bambang4");
         firstProduct.setProductQuantity(100);
 
         Product secondProduct = new Product();
