@@ -1,5 +1,9 @@
+import org.gradle.api.plugins.quality.Pmd
+
 plugins {
     java
+    jacoco
+    pmd
     id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -22,6 +26,12 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+pmd {
+    toolVersion = "7.0.0-rc4"
+    ruleSetFiles = files("$rootDir/config/pmd/ruleset.xml")
+    ruleSets = listOf()
 }
 
 val seleniumJavaVersion = "4.14.1"
@@ -48,6 +58,13 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+tasks.withType<Pmd>().configureEach {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
 tasks.register<Test>("unitTest") {
     description = "Runs unit tests."
     group = "verification"
@@ -64,4 +81,16 @@ tasks.register<Test>("functionalTest") {
     filter {
         includeTestsMatching("*FunctionalTest")
     }
+}
+
+tasks.test {
+    filter {
+        excludeTestsMatching("*FunctionalTest")
+    }
+
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }
