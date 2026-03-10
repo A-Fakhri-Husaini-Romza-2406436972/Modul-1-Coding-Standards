@@ -30,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
+    private static final String HISTORY_TESTER = "History Tester";
+    private static final String METHOD_VOUCHER_CODE = "VOUCHER_CODE";
 
     @Autowired
     private MockMvc mockMvc;
@@ -73,15 +75,15 @@ class OrderControllerTest {
 
     @Test
     void orderHistoryPostShouldReturnOrderListByAuthor() throws Exception {
-        Order firstOrder = createOrder("order-1", "History Tester");
-        Order secondOrder = createOrder("order-2", "History Tester");
-        when(orderService.findAllByAuthor("History Tester")).thenReturn(List.of(firstOrder, secondOrder));
+        Order firstOrder = createOrder("order-1", HISTORY_TESTER);
+        Order secondOrder = createOrder("order-2", HISTORY_TESTER);
+        when(orderService.findAllByAuthor(HISTORY_TESTER)).thenReturn(List.of(firstOrder, secondOrder));
 
         mockMvc.perform(post("/order/history")
-                        .param("author", "History Tester"))
+                        .param("author", HISTORY_TESTER))
                 .andExpect(status().isOk())
                 .andExpect(view().name("OrderList"))
-                .andExpect(model().attribute("author", "History Tester"))
+                .andExpect(model().attribute("author", HISTORY_TESTER))
                 .andExpect(model().attributeExists("orders"))
                 .andExpect(model().attribute("orders", hasSize(2)));
     }
@@ -104,15 +106,15 @@ class OrderControllerTest {
         when(orderService.findById("order-4")).thenReturn(order);
 
         Map<String, String> paymentData = Map.of(
-                "method", "VOUCHER_CODE",
+                "method", METHOD_VOUCHER_CODE,
                 "voucherCode", "ESHOP1234ABC5678"
         );
-        Payment payment = new Payment("payment-1", "VOUCHER_CODE", "SUCCESS", paymentData);
-        when(paymentService.addPayment(eq(order), eq("VOUCHER_CODE"), any()))
+        Payment payment = new Payment("payment-1", METHOD_VOUCHER_CODE, "SUCCESS", paymentData);
+        when(paymentService.addPayment(eq(order), eq(METHOD_VOUCHER_CODE), any()))
                 .thenReturn(payment);
 
         mockMvc.perform(post("/order/pay/order-4")
-                        .param("method", "VOUCHER_CODE")
+                        .param("method", METHOD_VOUCHER_CODE)
                         .param("voucherCode", "ESHOP1234ABC5678"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("PayOrderResult"))

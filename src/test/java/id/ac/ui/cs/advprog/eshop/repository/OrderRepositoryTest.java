@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -128,7 +129,7 @@ class OrderRepositoryTest {
         orderRepository.save(orders.get(1));
 
         List<Order> orderList = orderRepository.findAllByAuthor(
-                orders.get(1).getAuthor().toLowerCase());
+                orders.get(1).getAuthor().toLowerCase(Locale.ROOT));
         assertTrue(orderList.isEmpty());
     }
 }

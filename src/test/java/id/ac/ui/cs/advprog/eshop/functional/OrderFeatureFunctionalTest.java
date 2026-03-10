@@ -22,6 +22,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ExtendWith(SeleniumJupiter.class)
 class OrderFeatureFunctionalTest {
+    private static final String AUTHOR_INPUT_ID = "authorInput";
+    private static final String ORDER_HISTORY_PATH = "/order/history";
+    private static final String SUBMIT_BUTTON_SELECTOR = "button[type='submit']";
 
     @LocalServerPort
     private int serverPort;
@@ -40,10 +43,10 @@ class OrderFeatureFunctionalTest {
     void createOrderShouldRedirectToHistoryPage(ChromeDriver driver) {
         driver.get(baseUrl + "/order/create");
 
-        WebElement authorInput = driver.findElement(By.id("authorInput"));
+        WebElement authorInput = driver.findElement(By.id(AUTHOR_INPUT_ID));
         WebElement productNameInput = driver.findElement(By.id("productNameInput"));
         WebElement productQuantityInput = driver.findElement(By.id("productQuantityInput"));
-        WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+        WebElement submitButton = driver.findElement(By.cssSelector(SUBMIT_BUTTON_SELECTOR));
 
         authorInput.clear();
         authorInput.sendKeys("Order Tester");
@@ -54,9 +57,9 @@ class OrderFeatureFunctionalTest {
         submitButton.click();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.urlContains("/order/history"));
+        wait.until(ExpectedConditions.urlContains(ORDER_HISTORY_PATH));
         String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("/order/history"));
+        assertTrue(currentUrl.contains(ORDER_HISTORY_PATH));
     }
 
     @Test
@@ -64,9 +67,9 @@ class OrderFeatureFunctionalTest {
         createOrder(driver, "History Tester", "Sabun Cap Usep", "3");
         createOrder(driver, "Another Tester", "Pasta Gigi", "1");
 
-        driver.get(baseUrl + "/order/history");
-        WebElement authorInput = driver.findElement(By.id("authorInput"));
-        WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+        driver.get(baseUrl + ORDER_HISTORY_PATH);
+        WebElement authorInput = driver.findElement(By.id(AUTHOR_INPUT_ID));
+        WebElement submitButton = driver.findElement(By.cssSelector(SUBMIT_BUTTON_SELECTOR));
         authorInput.clear();
         authorInput.sendKeys("History Tester");
         submitButton.click();
@@ -83,9 +86,9 @@ class OrderFeatureFunctionalTest {
     void orderPayShouldReturnPaymentIdPage(ChromeDriver driver) {
         createOrder(driver, "Payment Flow Tester", "Sikat Gigi", "2");
 
-        driver.get(baseUrl + "/order/history");
-        driver.findElement(By.id("authorInput")).sendKeys("Payment Flow Tester");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        driver.get(baseUrl + ORDER_HISTORY_PATH);
+        driver.findElement(By.id(AUTHOR_INPUT_ID)).sendKeys("Payment Flow Tester");
+        driver.findElement(By.cssSelector(SUBMIT_BUTTON_SELECTOR)).click();
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".order-id")));
@@ -110,8 +113,8 @@ class OrderFeatureFunctionalTest {
         driver.findElement(By.id("authorInput")).sendKeys(author);
         driver.findElement(By.id("productNameInput")).sendKeys(productName);
         driver.findElement(By.id("productQuantityInput")).sendKeys(quantity);
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        driver.findElement(By.cssSelector(SUBMIT_BUTTON_SELECTOR)).click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.urlContains("/order/history"));
+        wait.until(ExpectedConditions.urlContains(ORDER_HISTORY_PATH));
     }
 }

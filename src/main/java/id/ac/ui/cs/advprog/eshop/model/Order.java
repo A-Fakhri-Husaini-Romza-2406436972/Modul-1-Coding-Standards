@@ -27,13 +27,17 @@ public class Order {
 
     public Order(String id, List<Product> products, Long orderTime, String author, String status) {
         this(id, products, orderTime, author);
-        this.setStatus(status);
+        validateStatus(status);
+        this.status = status;
     }
 
     public void setStatus(String status) {
-        if (OrderStatus.contains(status)) {
-            this.status = status;
-        } else {
+        validateStatus(status);
+        this.status = status;
+    }
+
+    private static void validateStatus(String status) {
+        if (!OrderStatus.contains(status)) {
             throw new IllegalArgumentException("Invalid order status");
         }
     }

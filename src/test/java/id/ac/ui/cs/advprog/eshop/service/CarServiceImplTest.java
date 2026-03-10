@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CarServiceImplTest {
+    private static final String CAR_ID_3 = "car-3";
 
     @Mock
     private CarRepository carRepository;
@@ -62,12 +63,12 @@ class CarServiceImplTest {
 
     @Test
     void findByIdShouldReturnCarFromRepository() {
-        Car car = createCar("car-3", "Mitsubishi Xpander", "Gray", 4);
-        when(carRepository.findById("car-3")).thenReturn(car);
+        Car car = createCar(CAR_ID_3, "Mitsubishi Xpander", "Gray", 4);
+        when(carRepository.findById(CAR_ID_3)).thenReturn(car);
 
-        Car result = carService.findById("car-3");
+        Car result = carService.findById(CAR_ID_3);
 
-        verify(carRepository).findById("car-3");
+        verify(carRepository).findById(CAR_ID_3);
         assertSame(car, result);
     }
 

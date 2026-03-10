@@ -12,6 +12,11 @@ class CarRepositoryImplTest {
 
     private static final String CAR_ID_1 = "car-1";
     private static final String CAR_ID_2 = "car-2";
+    private static final String CAR_NAME_AVANZA = "Toyota Avanza";
+    private static final String CAR_COLOR_BLACK = "Black";
+    private static final String MISSING_CAR_ID = "missing-car";
+    private static final String CAR_NAME_VELOZ = "Toyota Veloz";
+    private static final String CAR_COLOR_WHITE = "White";
 
     private CarRepositoryImpl carRepository;
 
@@ -22,12 +27,12 @@ class CarRepositoryImplTest {
 
     @Test
     void createShouldKeepProvidedId() {
-        Car car = createCar(CAR_ID_1, "Toyota Avanza", "Black", 3);
+        Car car = createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3);
 
         Car createdCar = carRepository.create(car);
 
         assertEquals(CAR_ID_1, createdCar.getCarId());
-        assertEquals("Toyota Avanza", createdCar.getCarName());
+        assertEquals(CAR_NAME_AVANZA, createdCar.getCarName());
     }
 
     @Test
@@ -42,7 +47,7 @@ class CarRepositoryImplTest {
 
     @Test
     void findAllShouldReturnAllCreatedCars() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
         carRepository.create(createCar(CAR_ID_2, "Honda Brio", "Red", 2));
 
         Iterator<Car> iterator = carRepository.findAll();
@@ -55,7 +60,7 @@ class CarRepositoryImplTest {
 
     @Test
     void findByIdShouldReturnCarWhenFound() {
-        Car car = createCar(CAR_ID_1, "Toyota Avanza", "Black", 3);
+        Car car = createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3);
         carRepository.create(car);
 
         Car foundCar = carRepository.findById(CAR_ID_1);
@@ -66,42 +71,42 @@ class CarRepositoryImplTest {
 
     @Test
     void findByIdShouldReturnNullWhenMissing() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
 
-        assertNull(carRepository.findById("missing-car"));
+        assertNull(carRepository.findById(MISSING_CAR_ID));
     }
 
     @Test
     void updateShouldModifyCarWhenFound() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
-        Car updatedCar = createCar("ignored-id", "Toyota Veloz", "White", 5);
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
+        Car updatedCar = createCar("ignored-id", CAR_NAME_VELOZ, CAR_COLOR_WHITE, 5);
 
         Car result = carRepository.update(CAR_ID_1, updatedCar);
 
         assertNotNull(result);
-        assertEquals("Toyota Veloz", result.getCarName());
-        assertEquals("White", result.getCarColor());
+        assertEquals(CAR_NAME_VELOZ, result.getCarName());
+        assertEquals(CAR_COLOR_WHITE, result.getCarColor());
         assertEquals(5, result.getCarQuantity());
     }
 
     @Test
     void updateShouldReturnNullWhenNotFound() {
-        Car updatedCar = createCar("ignored-id", "Toyota Veloz", "White", 5);
+        Car updatedCar = createCar("ignored-id", CAR_NAME_VELOZ, CAR_COLOR_WHITE, 5);
 
-        assertNull(carRepository.update("missing-car", updatedCar));
+        assertNull(carRepository.update(MISSING_CAR_ID, updatedCar));
     }
 
     @Test
     void updateShouldReturnNullWhenDifferentIdExists() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
-        Car updatedCar = createCar("ignored-id", "Toyota Veloz", "White", 5);
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
+        Car updatedCar = createCar("ignored-id", CAR_NAME_VELOZ, CAR_COLOR_WHITE, 5);
 
-        assertNull(carRepository.update("missing-car", updatedCar));
+        assertNull(carRepository.update(MISSING_CAR_ID, updatedCar));
     }
 
     @Test
     void deleteShouldRemoveCarWhenFound() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
 
         carRepository.delete(CAR_ID_1);
 
@@ -110,9 +115,9 @@ class CarRepositoryImplTest {
 
     @Test
     void deleteShouldNotAffectDataWhenIdMissing() {
-        carRepository.create(createCar(CAR_ID_1, "Toyota Avanza", "Black", 3));
+        carRepository.create(createCar(CAR_ID_1, CAR_NAME_AVANZA, CAR_COLOR_BLACK, 3));
 
-        carRepository.delete("missing-car");
+        carRepository.delete(MISSING_CAR_ID);
 
         assertNotNull(carRepository.findById(CAR_ID_1));
     }

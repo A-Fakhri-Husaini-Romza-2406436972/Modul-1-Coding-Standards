@@ -32,6 +32,8 @@ class PaymentServiceImplTest {
     private static final String REFERENCE_CODE_KEY = "referenceCode";
     private static final String ADDRESS_KEY = "address";
     private static final String DELIVERY_FEE_KEY = "deliveryFee";
+    private static final String BANK_BCA = "BCA";
+    private static final String REFERENCE_INV_12345 = "INV-12345";
 
     private PaymentService paymentService;
     private Order order;
@@ -101,8 +103,8 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithValidBankTransferData() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(BANK_NAME_KEY, "BCA");
-        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+        paymentData.put(BANK_NAME_KEY, BANK_BCA);
+        paymentData.put(REFERENCE_CODE_KEY, REFERENCE_INV_12345);
 
         Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
@@ -113,7 +115,7 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithIncompleteBankTransferData() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(BANK_NAME_KEY, "BCA");
+        paymentData.put(BANK_NAME_KEY, BANK_BCA);
         paymentData.put(REFERENCE_CODE_KEY, "");
 
         Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
@@ -125,9 +127,28 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithMissingBankName() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+        paymentData.put(REFERENCE_CODE_KEY, REFERENCE_INV_12345);
 
         Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithMissingReferenceCode() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put(BANK_NAME_KEY, BANK_BCA);
+
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithNullBankTransferData() {
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, null);
 
         assertEquals(STATUS_REJECTED, payment.getStatus());
         assertEquals(STATUS_FAILED, order.getStatus());
@@ -170,6 +191,17 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentWithMissingDeliveryFeeKey() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put(ADDRESS_KEY, "Jl. Margonda Raya");
+
+        Payment payment = paymentService.addPayment(order, METHOD_CASH_ON_DELIVERY, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
     void testAddPaymentWithNullCashOnDeliveryData() {
         Payment payment = paymentService.addPayment(order, METHOD_CASH_ON_DELIVERY, null);
 
@@ -188,8 +220,8 @@ class PaymentServiceImplTest {
     @Test
     void testSetStatusToRejectedShouldSetOrderToFailed() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(BANK_NAME_KEY, "BCA");
-        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+        paymentData.put(BANK_NAME_KEY, BANK_BCA);
+        paymentData.put(REFERENCE_CODE_KEY, REFERENCE_INV_12345);
         Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
         paymentService.setStatus(payment, STATUS_REJECTED);
@@ -201,8 +233,8 @@ class PaymentServiceImplTest {
     @Test
     void testSetStatusOtherValueShouldNotChangeOrderStatus() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(BANK_NAME_KEY, "BCA");
-        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+        paymentData.put(BANK_NAME_KEY, BANK_BCA);
+        paymentData.put(REFERENCE_CODE_KEY, REFERENCE_INV_12345);
         Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
         paymentService.setStatus(payment, STATUS_PENDING);
