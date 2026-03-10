@@ -17,6 +17,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PaymentServiceImplTest {
 
+    private static final String METHOD_VOUCHER_CODE = "VOUCHER_CODE";
+    private static final String METHOD_BANK_TRANSFER = "BANK_TRANSFER";
+    private static final String STATUS_SUCCESS = "SUCCESS";
+    private static final String STATUS_REJECTED = "REJECTED";
+    private static final String STATUS_FAILED = "FAILED";
+    private static final String VOUCHER_CODE_KEY = "voucherCode";
+    private static final String BANK_NAME_KEY = "bankName";
+    private static final String REFERENCE_CODE_KEY = "referenceCode";
+
     private PaymentService paymentService;
     private Order order;
 
@@ -30,76 +39,76 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithValidVoucherCode() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+        paymentData.put(VOUCHER_CODE_KEY, "ESHOP1234ABC5678");
 
-        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+        Payment payment = paymentService.addPayment(order, METHOD_VOUCHER_CODE, paymentData);
 
         assertNotNull(payment.getId());
-        assertEquals("VOUCHER_CODE", payment.getMethod());
-        assertEquals("SUCCESS", payment.getStatus());
-        assertEquals("SUCCESS", order.getStatus());
+        assertEquals(METHOD_VOUCHER_CODE, payment.getMethod());
+        assertEquals(STATUS_SUCCESS, payment.getStatus());
+        assertEquals(STATUS_SUCCESS, order.getStatus());
         assertEquals(payment.getId(), paymentService.getPayment(payment.getId()).getId());
     }
 
     @Test
     void testAddPaymentWithInvalidVoucherCode() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "INVALID-CODE");
+        paymentData.put(VOUCHER_CODE_KEY, "INVALID-CODE");
 
-        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+        Payment payment = paymentService.addPayment(order, METHOD_VOUCHER_CODE, paymentData);
 
-        assertEquals("REJECTED", payment.getStatus());
-        assertEquals("FAILED", order.getStatus());
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
     }
 
     @Test
     void testAddPaymentWithValidBankTransferData() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("bankName", "BCA");
-        paymentData.put("referenceCode", "INV-12345");
+        paymentData.put(BANK_NAME_KEY, "BCA");
+        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
 
-        Payment payment = paymentService.addPayment(order, "BANK_TRANSFER", paymentData);
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
-        assertEquals("SUCCESS", payment.getStatus());
-        assertEquals("SUCCESS", order.getStatus());
+        assertEquals(STATUS_SUCCESS, payment.getStatus());
+        assertEquals(STATUS_SUCCESS, order.getStatus());
     }
 
     @Test
     void testAddPaymentWithIncompleteBankTransferData() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("bankName", "BCA");
-        paymentData.put("referenceCode", "");
+        paymentData.put(BANK_NAME_KEY, "BCA");
+        paymentData.put(REFERENCE_CODE_KEY, "");
 
-        Payment payment = paymentService.addPayment(order, "BANK_TRANSFER", paymentData);
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
-        assertEquals("REJECTED", payment.getStatus());
-        assertEquals("FAILED", order.getStatus());
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
     }
 
     @Test
     void testSetStatusToRejectedShouldSetOrderToFailed() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("bankName", "BCA");
-        paymentData.put("referenceCode", "INV-12345");
-        Payment payment = paymentService.addPayment(order, "BANK_TRANSFER", paymentData);
+        paymentData.put(BANK_NAME_KEY, "BCA");
+        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
 
-        paymentService.setStatus(payment, "REJECTED");
+        paymentService.setStatus(payment, STATUS_REJECTED);
 
-        assertEquals("REJECTED", payment.getStatus());
-        assertEquals("FAILED", order.getStatus());
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
     }
 
     @Test
     void testGetAllPayments() {
         Map<String, String> voucherData = new HashMap<>();
-        voucherData.put("voucherCode", "ESHOP1234ABC5678");
-        paymentService.addPayment(order, "VOUCHER_CODE", voucherData);
+        voucherData.put(VOUCHER_CODE_KEY, "ESHOP1234ABC5678");
+        paymentService.addPayment(order, METHOD_VOUCHER_CODE, voucherData);
 
         Order secondOrder = createOrder("order-2");
         Map<String, String> transferData = new HashMap<>();
-        transferData.put("bankName", "Mandiri");
-        transferData.put("referenceCode", "INV-99999");
-        paymentService.addPayment(secondOrder, "BANK_TRANSFER", transferData);
+        transferData.put(BANK_NAME_KEY, "Mandiri");
+        transferData.put(REFERENCE_CODE_KEY, "INV-99999");
+        paymentService.addPayment(secondOrder, METHOD_BANK_TRANSFER, transferData);
 
         List<Payment> allPayments = paymentService.getAllPayments();
         assertEquals(2, allPayments.size());
