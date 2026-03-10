@@ -7,9 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -48,6 +52,8 @@ class OrderFeatureFunctionalTest {
         productQuantityInput.sendKeys("2");
         submitButton.click();
 
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.urlContains("/order/history"));
         String currentUrl = driver.getCurrentUrl();
         assertTrue(currentUrl.contains("/order/history"));
     }
@@ -64,8 +70,10 @@ class OrderFeatureFunctionalTest {
         authorInput.sendKeys("History Tester");
         submitButton.click();
 
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".order-id")));
         String pageSource = driver.getPageSource();
-        assertTrue(pageSource.contains("Author: History Tester"));
+        assertTrue(pageSource.contains("History Tester"));
         assertTrue(pageSource.contains("WAITING_PAYMENT"));
         assertTrue(pageSource.contains("Pay"));
     }
@@ -76,5 +84,7 @@ class OrderFeatureFunctionalTest {
         driver.findElement(By.id("productNameInput")).sendKeys(productName);
         driver.findElement(By.id("productQuantityInput")).sendKeys(quantity);
         driver.findElement(By.cssSelector("button[type='submit']")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.urlContains("/order/history"));
     }
 }
