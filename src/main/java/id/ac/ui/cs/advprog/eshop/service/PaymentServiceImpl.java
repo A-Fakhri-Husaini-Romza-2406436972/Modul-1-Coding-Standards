@@ -22,6 +22,12 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String METHOD_BANK_TRANSFER = "BANK_TRANSFER";
     private static final String METHOD_CASH_ON_DELIVERY = "CASH_ON_DELIVERY";
 
+    private static final String VOUCHER_CODE_KEY = "voucherCode";
+    private static final String BANK_NAME_KEY = "bankName";
+    private static final String REFERENCE_CODE_KEY = "referenceCode";
+    private static final String ADDRESS_KEY = "address";
+    private static final String DELIVERY_FEE_KEY = "deliveryFee";
+
     private final PaymentRepository paymentRepository;
     private final Map<String, Order> orderByPaymentId = new HashMap<>();
 
@@ -49,15 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment setStatus(Payment payment, String status) {
         payment.setStatus(status);
         paymentRepository.save(payment);
-
-        Order relatedOrder = orderByPaymentId.get(payment.getId());
-        if (relatedOrder != null) {
-            if (STATUS_SUCCESS.equals(status)) {
-                relatedOrder.setStatus(OrderStatus.SUCCESS.getValue());
-            } else if (STATUS_REJECTED.equals(status)) {
-                relatedOrder.setStatus(OrderStatus.FAILED.getValue());
-            }
-        }
+        synchronizeOrderStatus(payment.getId(), status);
 
         return payment;
     }
@@ -78,13 +76,13 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (METHOD_BANK_TRANSFER.equals(method)) {
-            return hasValue(paymentData, "bankName") && hasValue(paymentData, "referenceCode")
+            return hasValue(paymentData, BANK_NAME_KEY) && hasValue(paymentData, REFERENCE_CODE_KEY)
                     ? STATUS_SUCCESS
                     : STATUS_REJECTED;
         }
 
         if (METHOD_CASH_ON_DELIVERY.equals(method)) {
-            return hasValue(paymentData, "address") && hasValue(paymentData, "deliveryFee")
+            return hasValue(paymentData, ADDRESS_KEY) && hasValue(paymentData, DELIVERY_FEE_KEY)
                     ? STATUS_SUCCESS
                     : STATUS_REJECTED;
         }
@@ -93,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean isValidVoucherCode(Map<String, String> paymentData) {
-        String voucherCode = paymentData == null ? null : paymentData.get("voucherCode");
+        String voucherCode = paymentData == null ? null : paymentData.get(VOUCHER_CODE_KEY);
         if (voucherCode == null) {
             return false;
         }
@@ -112,6 +110,19 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         String value = paymentData.get(key);
-        return value != null && !value.isEmpty();
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private void synchronizeOrderStatus(String paymentId, String paymentStatus) {
+        Order relatedOrder = orderByPaymentId.get(paymentId);
+        if (relatedOrder == null) {
+            return;
+        }
+
+        if (STATUS_SUCCESS.equals(paymentStatus)) {
+            relatedOrder.setStatus(OrderStatus.SUCCESS.getValue());
+        } else if (STATUS_REJECTED.equals(paymentStatus)) {
+            relatedOrder.setStatus(OrderStatus.FAILED.getValue());
+        }
     }
 }
