@@ -108,7 +108,7 @@ class OrderControllerTest {
                 "voucherCode", "ESHOP1234ABC5678"
         );
         Payment payment = new Payment("payment-1", "VOUCHER_CODE", "SUCCESS", paymentData);
-        when(paymentService.addPayment(eq(order), eq("VOUCHER_CODE"), any(Map.class)))
+        when(paymentService.addPayment(eq(order), eq("VOUCHER_CODE"), any()))
                 .thenReturn(payment);
 
         mockMvc.perform(post("/order/pay/order-4")
