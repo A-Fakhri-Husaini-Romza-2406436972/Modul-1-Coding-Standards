@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -76,6 +77,32 @@ class OrderFeatureFunctionalTest {
         assertTrue(pageSource.contains("History Tester"));
         assertTrue(pageSource.contains("WAITING_PAYMENT"));
         assertTrue(pageSource.contains("Pay"));
+    }
+
+    @Test
+    void orderPayShouldReturnPaymentIdPage(ChromeDriver driver) {
+        createOrder(driver, "Payment Flow Tester", "Sikat Gigi", "2");
+
+        driver.get(baseUrl + "/order/history");
+        driver.findElement(By.id("authorInput")).sendKeys("Payment Flow Tester");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".order-id")));
+        String orderId = driver.findElement(By.cssSelector(".order-id")).getText();
+        driver.get(baseUrl + "/order/pay/" + orderId);
+
+        WebElement methodInput = driver.findElement(By.id("methodInput"));
+        WebElement voucherCodeInput = driver.findElement(By.id("voucherCodeInput"));
+        Select methodSelect = new Select(methodInput);
+        methodSelect.selectByValue("VOUCHER_CODE");
+        voucherCodeInput.sendKeys("ESHOP1234ABC5678");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("paymentIdText")));
+        String pageSource = driver.getPageSource();
+        assertTrue(pageSource.contains("Payment ID"));
+        assertTrue(pageSource.contains("SUCCESS"));
     }
 
     private void createOrder(ChromeDriver driver, String author, String productName, String quantity) {

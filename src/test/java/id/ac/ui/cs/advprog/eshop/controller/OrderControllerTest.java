@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Order;
+import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.OrderService;
 import id.ac.ui.cs.advprog.eshop.service.PaymentService;
@@ -12,9 +13,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -79,6 +84,40 @@ class OrderControllerTest {
                 .andExpect(model().attribute("author", "History Tester"))
                 .andExpect(model().attributeExists("orders"))
                 .andExpect(model().attribute("orders", hasSize(2)));
+    }
+
+    @Test
+    void orderPayPageShouldReturnPayOrderViewWithOrder() throws Exception {
+        Order order = createOrder("order-3", "Pay Tester");
+        when(orderService.findById("order-3")).thenReturn(order);
+
+        mockMvc.perform(get("/order/pay/order-3"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("PayOrder"))
+                .andExpect(model().attributeExists("order"))
+                .andExpect(model().attribute("order", samePropertyValuesAs(order)));
+    }
+
+    @Test
+    void orderPayPostShouldCreatePaymentAndReturnPaymentResultView() throws Exception {
+        Order order = createOrder("order-4", "Pay Tester");
+        when(orderService.findById("order-4")).thenReturn(order);
+
+        Map<String, String> paymentData = Map.of(
+                "method", "VOUCHER_CODE",
+                "voucherCode", "ESHOP1234ABC5678"
+        );
+        Payment payment = new Payment("payment-1", "VOUCHER_CODE", "SUCCESS", paymentData);
+        when(paymentService.addPayment(eq(order), eq("VOUCHER_CODE"), any(Map.class)))
+                .thenReturn(payment);
+
+        mockMvc.perform(post("/order/pay/order-4")
+                        .param("method", "VOUCHER_CODE")
+                        .param("voucherCode", "ESHOP1234ABC5678"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("PayOrderResult"))
+                .andExpect(model().attributeExists("payment"))
+                .andExpect(model().attribute("payment", samePropertyValuesAs(payment)));
     }
 
     private Order createOrder(String orderId, String author) {
