@@ -17,8 +17,12 @@ public enum OrderStatus {
     }
 
     public static boolean contains(String param) {
+        if (param == null) {
+            return false;
+        }
+
         for (OrderStatus orderStatus : OrderStatus.values()) {
-            if (orderStatus.name().equals(param)) {
+            if (orderStatus.getValue().equals(param)) {
                 return true;
             }
         }
