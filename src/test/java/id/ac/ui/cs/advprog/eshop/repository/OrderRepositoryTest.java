@@ -32,7 +32,7 @@ class OrderRepositoryTest {
                 "13652556-012a-4c07-b546-54eb1396d79b",
                 products,
                 1708560000L,
-                "Safira Sudrajati"
+                "Safira Sudrajat"
         );
         orders.add(order1);
 
