@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Result</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h3>Payment Result</h3>
+
+    <div th:if="${payment != null}">
+        <p><strong>Payment ID:</strong> <span id="paymentIdText" th:text="${payment.id}"></span></p>
+        <p><strong>Method:</strong> <span th:text="${payment.method}"></span></p>
+        <p><strong>Status:</strong> <span th:text="${payment.status}"></span></p>
+    </div>
+    <div th:if="${payment == null}">
+        <p>Payment failed to process.</p>
+    </div>
+</div>
+</body>
+</html>
