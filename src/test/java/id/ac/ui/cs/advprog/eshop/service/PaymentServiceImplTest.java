@@ -71,7 +71,18 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithInvalidVoucherNumericCount() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put(VOUCHER_CODE_KEY, "ESHOPABCDEFGH1234");
+        paymentData.put(VOUCHER_CODE_KEY, "ESHOPABCD1234EFG");
+
+        Payment payment = paymentService.addPayment(order, METHOD_VOUCHER_CODE, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithInvalidVoucherPrefix() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put(VOUCHER_CODE_KEY, "ABCDE1234ABC5678");
 
         Payment payment = paymentService.addPayment(order, METHOD_VOUCHER_CODE, paymentData);
 
@@ -112,6 +123,17 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentWithMissingBankName() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put(REFERENCE_CODE_KEY, "INV-12345");
+
+        Payment payment = paymentService.addPayment(order, METHOD_BANK_TRANSFER, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
     void testAddPaymentWithValidCashOnDeliveryData() {
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put(ADDRESS_KEY, "Jl. Margonda Raya");
@@ -130,6 +152,26 @@ class PaymentServiceImplTest {
         paymentData.put(DELIVERY_FEE_KEY, "10000");
 
         Payment payment = paymentService.addPayment(order, METHOD_CASH_ON_DELIVERY, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithMissingDeliveryFee() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put(ADDRESS_KEY, "Jl. Margonda Raya");
+        paymentData.put(DELIVERY_FEE_KEY, "");
+
+        Payment payment = paymentService.addPayment(order, METHOD_CASH_ON_DELIVERY, paymentData);
+
+        assertEquals(STATUS_REJECTED, payment.getStatus());
+        assertEquals(STATUS_FAILED, order.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithNullCashOnDeliveryData() {
+        Payment payment = paymentService.addPayment(order, METHOD_CASH_ON_DELIVERY, null);
 
         assertEquals(STATUS_REJECTED, payment.getStatus());
         assertEquals(STATUS_FAILED, order.getStatus());
