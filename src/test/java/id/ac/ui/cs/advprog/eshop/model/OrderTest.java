@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderTest {
     private List<Product> products;
@@ -32,8 +32,12 @@ public class OrderTest {
         this.products.clear();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            Order order = new Order("13652556-012a-4c07-b546-54eb1396d79b"),
-                    this.products, 1708560000L, "Safira Sudrajat");
+            Order order = new Order(
+                    "13652556-012a-4c07-b546-54eb1396d79b",
+                    this.products,
+                    1708560000L,
+                    "Safira Sudrajati"
+            );
         });
     }
 
@@ -51,7 +55,7 @@ public class OrderTest {
         assertEquals("Sampo Cap Bambang", order.getProducts().get(0).getProductName());
         assertEquals("Sabun Cap Usep", order.getProducts().get(1).getProductName());
 
-        assertEquals("13652556-012a-4c07-b546-54eb1396d79b", order.getID());
+        assertEquals("13652556-012a-4c07-b546-54eb1396d79b", order.getId());
         assertEquals(1708560000L, order.getOrderTime());
         assertEquals("Safira Sudrajati", order.getAuthor());
         assertEquals("WAITING_PAYMENT", order.getStatus());
