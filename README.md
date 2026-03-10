@@ -39,3 +39,52 @@ Refleksi 4: SOLID
 - Pengujian rumit: Tanpa DIP, service harus memakai repository konkret sehingga unit test berubah menjadi integrasi dan sulit diisolasi.
 - Risiko regresi tinggi: Tanpa OCP/LSP, menambah jenis penyimpanan baru akan memaksa modifikasi kelas lama, sehingga peluang bug meningkat.
 
+Refleksi 5:
+
+1) Refleksi terhadap Workflow TDD
+
+Pada latihan ini saya mengikuti workflow Test-Driven Development (TDD) di mana test dibuat terlebih dahulu sebelum implementasi kode. Berdasarkan Percival (2017) dalam *Principles and Best Practice of Testing*, pendekatan ini membantu pengembang memahami perilaku sistem yang diharapkan sebelum menulis implementasi sebenarnya.
+
+Menurut saya, workflow TDD cukup membantu karena membuat proses pengembangan lebih terarah. Dengan menulis test terlebih dahulu, saya dapat mengetahui kebutuhan sistem dengan lebih jelas. Ketika test gagal, hal tersebut menjadi panduan untuk menambahkan implementasi yang diperlukan agar test tersebut berhasil. Selain itu, dengan menjalankan test secara berkala, saya dapat memastikan bahwa perubahan pada kode tidak merusak fungsi yang sudah ada sebelumnya.
+
+Namun, masih ada beberapa hal yang dapat diperbaiki di masa depan. Misalnya, saya perlu membuat lebih banyak test case yang mencakup berbagai kemungkinan kondisi seperti edge cases atau kondisi batas. Selain itu, saya juga perlu lebih memperhatikan struktur penulisan test agar lebih mudah dipahami dan merepresentasikan perilaku sistem dengan lebih jelas.
+
+---
+
+2) Refleksi terhadap Prinsip F.I.R.S.T
+
+Unit test yang dibuat dalam tutorial ini secara umum telah mengikuti prinsip F.I.R.S.T:
+
+- **Fast**: Test dapat dijalankan dengan cepat karena menggunakan logika sederhana dan dependency seperti repository dimock menggunakan Mockito.
+- **Independent**: Setiap test berdiri sendiri dan tidak bergantung pada test lainnya. Penggunaan `@BeforeEach` membantu memastikan data test selalu diinisialisasi ulang sebelum setiap test dijalankan.
+- **Repeatable**: Test menghasilkan hasil yang konsisten setiap kali dijalankan karena tidak bergantung pada sistem eksternal seperti database atau jaringan.
+- **Self-validating**: Setiap test memiliki assertion yang secara otomatis menentukan apakah test berhasil atau gagal.
+- **Timely**: Test dibuat sebelum atau bersamaan dengan implementasi kode sesuai dengan pendekatan TDD.
+
+Meskipun sebagian besar prinsip F.I.R.S.T sudah terpenuhi, masih ada beberapa hal yang bisa ditingkatkan. Misalnya, penamaan test bisa dibuat lebih deskriptif agar lebih mudah dipahami. Selain itu, menambahkan lebih banyak test untuk kondisi error atau edge cases juga dapat meningkatkan kualitas dan keandalan pengujian.
+
+Refleksi Bonus 2 (Refactor Kode Teman):
+
+1) Pendapat saya tentang kode partner
+
+Kode partner saya sudah berjalan dan memenuhi fitur utama payment. Struktur dasarnya sudah baik, tetapi masih ada kekurangan pada maintainability: dependency service masih cukup erat ke implementasi konkret validator, ada penggunaan magic string untuk status, dan pola pemetaan validator belum cukup fleksibel untuk penambahan metode pembayaran baru.
+
+2) Kontribusi yang saya lakukan
+
+Saya berkontribusi dengan melakukan refactor terarah tanpa mengubah perilaku bisnis. Saya memperbaiki struktur dependency di service payment, merapikan kontrak validator agar lebih mudah diperluas, menyesuaikan unit test setelah perubahan desain, dan memverifikasi stabilitas aplikasi lewat pengujian otomatis.
+
+3) Code smell yang saya temukan
+
+- Tight coupling antara `PaymentServiceImpl` dan validator konkret.
+- Magic string pada status order (contoh nilai status gagal yang ditulis literal).
+- Kurang extensible karena pemilihan validator belum berbasis kontrak method yang didukung validator.
+- Dependency kurang eksplisit akibat penggunaan field injection.
+
+4) Langkah refactor yang saya sarankan dan eksekusi
+
+- Menambahkan kontrak `supportedMethod()` pada `PaymentDataValidator`.
+- Mengubah service payment ke constructor injection dan menerima kumpulan validator dari Spring DI.
+- Membangun registry validator berdasarkan method yang didukung masing-masing validator.
+- Mengganti magic string status order dengan enum (`OrderStatus`) agar lebih aman dan konsisten.
+- Memperbarui test agar tetap valid terhadap desain baru dan memastikan tidak ada regresi lewat `test` serta `functionalTest`.
+
