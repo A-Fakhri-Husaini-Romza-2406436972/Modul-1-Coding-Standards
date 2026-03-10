@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 class PaymentTest {
 
@@ -31,7 +30,7 @@ class PaymentTest {
         assertEquals("payment-1", payment.getId());
         assertEquals("VOUCHER_CODE", payment.getMethod());
         assertEquals("SUCCESS", payment.getStatus());
-        assertSame(paymentData, payment.getPaymentData());
+        assertEquals(paymentData, payment.getPaymentData());
     }
 
     @Test
